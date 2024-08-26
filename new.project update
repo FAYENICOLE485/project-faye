@@ -1,41 +1,85 @@
-#include <string>
 #include <iostream>
+#include <filesystem>
+#include <string>
 
+namespace fs = std::filesystem;
 
-    void displayFiles(){
-      system("dir);
-      system("pause");
-{
-void createDirectory(){
-cout << endl
-         << "---------------------\n"
-         << "   LIST FILE DETAIL   \n"
-         << "---------------------\n"
-         << "1.List all Files\n"
-         << "2.List of Extension files\n"
-         << "3.List of Name files\n"
-         << "Enter the number: ";
-    cin >> dirChoice;
-
-
-switch (dirChoice) {
-        case 1: {
-            cout << "Listing all files...\n";
-            system("dir /a-d");
-            break;
+void listFiles(const fs::path& path) {
+    try {
+        if (fs::exists(path) && fs::is_directory(path)) {
+            std::cout << "Files in directory '" << path << "':\n";
+            for (const auto& entry : fs::directory_iterator(path)) {
+                std::cout << entry.path().filename().string() << "\n";
+            }
+        } else {
+            std::cout << "Path does not exist or is not a directory.\n";
         }
-        case 2: {
-            string extension;
-            cout << "Enter the file extension (e.g., .txt): ";
-            cin >> extension;
-            string command = "dir /a-d *" + extension;
-            system(command.c_str());
-            break;
+    } catch (const fs::filesystem_error& e) {
+        std::cout << "Error: " << e.what() << "\n";
+    }
+}
+
+void createDirectory(const fs::path& path) {
+    try {
+        if (fs::create_directory(path)) {
+            std::cout << "Directory created: " << path << "\n";
+        } else {
+            std::cout << "Directory could not be created or already exists.\n";
         }
-        case 3: {
-            string pattern;
-            cout << "Enter the pattern (e.g., *.txt): ";
-            cin >> pattern;
-            string command = "dir /a-d " + pattern;
-            system(command.c_str());
-            break;
+    } catch (const fs::filesystem_error& e) {
+        std::cout << "Error: " << e.what() << "\n";
+    }
+}
+
+void changeDirectory(fs::path& currentPath, const fs::path& newPath) {
+    try {
+        if (fs::exists(newPath) && fs::is_directory(newPath)) {
+            currentPath = fs::absolute(newPath);
+            std::cout << "Changed directory to: " << currentPath << "\n";
+        } else {
+            std::cout << "Path does not exist or is not a directory.\n";
+        }
+    } catch (const fs::filesystem_error& e) {
+        std::cout << "Error: " << e.what() << "\n";
+    }
+}
+
+int main() {
+    fs::path currentPath = fs::current_path();
+    int choice;
+    std::string input;
+
+    do {
+        std::cout << "\nDirectory Management System\n";
+        std::cout << "1. List files\n";
+        std::cout << "2. Create directory\n";
+        std::cout << "3. Change current directory\n";
+        std::cout << "4. Exit\n";
+        std::cout << "Enter your choice: ";
+        std::cin >> choice;
+
+        switch (choice) {
+            case 1:
+                std::cout << "Current directory: " << currentPath << "\n";
+                listFiles(currentPath);
+                break;
+            case 2:
+                std::cout << "Enter directory name to create: ";
+                std::cin >> input;
+                createDirectory(currentPath / input);
+                break;
+            case 3:
+                std::cout << "Enter path to change to: ";
+                std::cin >> input;
+                changeDirectory(currentPath, input);
+                break;
+            case 4:
+                std::cout << "Exiting...\n";
+                break;
+            default:
+                std::cout << "Invalid choice. Please try again.\n";
+        }
+    } while (choice != 4);
+
+    return 0;
+}
