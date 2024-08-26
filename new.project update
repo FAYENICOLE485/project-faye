@@ -1,9 +1,5 @@
 #include <string>
 #include <iostream>
-#include <cstdio>
-#include <cstdio>
-#include <direct.h>
-#include <windows.h>
 
 
     void displayFiles(){
@@ -11,16 +7,35 @@
       system("pause");
 {
 void createDirectory(){
-            std::cout<< "nEntername"
-            std::string dirname;
-            std::cin >>dirname
-
-new directory();
-break;
-
-
-
-}
-return;
+cout << endl
+         << "---------------------\n"
+         << "   LIST FILE DETAIL   \n"
+         << "---------------------\n"
+         << "1.List all Files\n"
+         << "2.List of Extension files\n"
+         << "3.List of Name files\n"
+         << "Enter the number: ";
+    cin >> dirChoice;
 
 
+switch (dirChoice) {
+        case 1: {
+            cout << "Listing all files...\n";
+            system("dir /a-d");
+            break;
+        }
+        case 2: {
+            string extension;
+            cout << "Enter the file extension (e.g., .txt): ";
+            cin >> extension;
+            string command = "dir /a-d *" + extension;
+            system(command.c_str());
+            break;
+        }
+        case 3: {
+            string pattern;
+            cout << "Enter the pattern (e.g., *.txt): ";
+            cin >> pattern;
+            string command = "dir /a-d " + pattern;
+            system(command.c_str());
+            break;
